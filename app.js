@@ -1,5 +1,55 @@
 // Task Management App
 
+// Sort tasks by priority
+function sortTasks() {
+  const priorityOrder = { High: 3, Medium: 2, Low: 1 }
+  todaysTasks.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority])
+  saveData()
+  renderTodaysTasks()
+}
+
+// Unschedule a task
+function unscheduleTask(index) {
+  const task = todaysTasks.splice(index, 1)[0]
+  unscheduledTasks.push(task)
+  saveData()
+  renderTasks()
+}
+
+// Toggle category management section
+function toggleCategoryManagement() {
+  const content = document.querySelector(".collapse-content")
+  if (content.style.maxHeight) {
+    content.style.maxHeight = null
+  } else {
+    content.style.maxHeight = content.scrollHeight + "px"
+  }
+}
+
+// Rename category
+function renameCategory(index) {
+  const newName = prompt("Enter new category name:")
+  if (newName && newName.trim() !== "" && !categories.includes(newName)) {
+    const oldName = categories[index]
+    categories[index] = newName
+
+    // Update category for all tasks
+    ;[unscheduledTasks, todaysTasks, completedTasks].forEach((taskList) => {
+      taskList.forEach((task) => {
+        if (task.category === oldName) {
+          task.category = newName
+        }
+      })
+    })
+
+    saveData()
+    renderCategories()
+    renderTasks()
+  } else if (categories.includes(newName)) {
+    alert("Category name already exists.")
+  }
+}
+
 // DOM Elements
 const taskForm = document.getElementById("task-form")
 const taskTitle = document.getElementById("task-title")
@@ -33,6 +83,7 @@ function loadData() {
 
   renderTasks()
   renderCategories()
+  resetTaskForm()
 }
 
 // Save tasks and categories to localStorage
@@ -82,21 +133,27 @@ function createTaskElement(task, index, listType) {
   const li = document.createElement("li")
   const priorityEmoji = task.priority === "High" ? "🔴" : task.priority === "Medium" ? "🟡" : "🟢"
   li.innerHTML = `
-        <span>${listType === "today" ? priorityEmoji : ""} ${task.title} (${task.priority} - ${task.category})</span>
-        <div class="task-actions">
-            ${listType === "unscheduled" ? `<button onclick="addToToday(${index})">Add to Today</button>` : ""}
-            ${
-              listType === "today"
-                ? `
-                <button onclick="moveUp(${index})">↑</button>
-                <button onclick="moveDown(${index})">↓</button>
-                <button onclick="completeTask(${index})">Complete</button>
-            `
-                : ""
-            }
-            ${listType === "completed" ? `<button onclick="removeCompleted(${index})">Remove</button>` : ""}
-            <button onclick="editTask(${index}, '${listType}')">Edit</button>
-            ${listType === "unscheduled" ? `<button onclick="deleteTask(${index})">Delete</button>` : ""}
+        <div class="task-main">
+            <span>${listType === "today" ? priorityEmoji : ""} ${task.title}</span>
+            <div class="task-actions">
+                ${listType === "unscheduled" ? `<button onclick="addToToday(${index})">Add to Today</button>` : ""}
+                ${
+                  listType === "today"
+                    ? `
+                    <button onclick="moveUp(${index})">↑</button>
+                    <button onclick="moveDown(${index})">↓</button>
+                    <button onclick="completeTask(${index})">Complete</button>
+                    <button onclick="unscheduleTask(${index})">Unschedule</button>
+                `
+                    : ""
+                }
+                ${listType === "completed" ? `<button onclick="removeCompleted(${index})">Remove</button>` : ""}
+                <button onclick="editTask(${index}, '${listType}')">Edit</button>
+                ${listType === "unscheduled" ? `<button onclick="deleteTask(${index})">Delete</button>` : ""}
+            </div>
+        </div>
+        <div class="task-meta">
+            Priority: ${task.priority} | Category: ${task.category}
         </div>
     `
   li.draggable = true
@@ -192,9 +249,13 @@ function editTask(index, listType) {
   taskPriority.value = task.priority
   taskCategory.value = task.category
 
-  const updateButton = document.createElement("button")
-  updateButton.textContent = "Update Task"
-  updateButton.onclick = (e) => {
+  document.getElementById("task-form-title").textContent = "Edit Task"
+  document.getElementById("create-task-btn").style.display = "none"
+  document.getElementById("update-task-btn").style.display = "inline-block"
+  document.getElementById("delete-task-btn").style.display = "inline-block"
+  document.getElementById("cancel-edit-btn").style.display = "inline-block"
+
+  document.getElementById("update-task-btn").onclick = (e) => {
     e.preventDefault()
     task.title = taskTitle.value
     task.priority = taskPriority.value
@@ -202,11 +263,24 @@ function editTask(index, listType) {
 
     saveData()
     renderTasks()
-    taskForm.removeChild(updateButton)
-    taskForm.reset()
+    resetTaskForm()
   }
 
-  taskForm.appendChild(updateButton)
+  document.getElementById("delete-task-btn").onclick = (e) => {
+    e.preventDefault()
+    if (listType === "unscheduled") {
+      deleteTask(index)
+    } else if (listType === "today") {
+      todaysTasks.splice(index, 1)
+    } else {
+      completedTasks.splice(index, 1)
+    }
+    saveData()
+    renderTasks()
+    resetTaskForm()
+  }
+
+  document.getElementById("cancel-edit-btn").onclick = resetTaskForm
 }
 
 // Delete a task
@@ -262,6 +336,7 @@ function renderCategories() {
             <div>
                 <button onclick="moveCategoryUp(${index})">↑</button>
                 <button onclick="moveCategoryDown(${index})">↓</button>
+                <button onclick="renameCategory(${index})">Rename</button>
                 <button onclick="deleteCategory(${index})">Delete</button>
             </div>
         `
@@ -328,4 +403,16 @@ loadData()
 
 // Set default category to "Work"
 taskCategory.value = "Work"
+
+function resetTaskForm() {
+  taskForm.reset()
+  document.getElementById("task-form-title").textContent = "Create New Task"
+  document.getElementById("create-task-btn").style.display = "inline-block"
+  document.getElementById("update-task-btn").style.display = "none"
+  document.getElementById("delete-task-btn").style.display = "none"
+  document.getElementById("cancel-edit-btn").style.display = "none"
+}
+
+document.getElementById("sort-tasks").addEventListener("click", sortTasks)
+document.querySelector(".collapse-btn").addEventListener("click", toggleCategoryManagement)
 
