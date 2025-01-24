@@ -64,6 +64,13 @@ const clearCompletedBtn = document.getElementById("clear-completed")
 const categoryForm = document.getElementById("category-form")
 const newCategoryInput = document.getElementById("new-category")
 const categoryList = document.getElementById("category-list")
+const settingsBtn = document.getElementById("settings-btn") // Added settings button
+const settingsModal = document.getElementById("settings-modal") // Added settings modal
+const closeModalBtn = document.getElementById("close-modal-btn") // Added close modal button
+const newSessionBtn = document.getElementById("new-session-btn") // Added new session button
+const importTodosBtn = document.getElementById("import-todos-btn") // Added import todos button
+const exportTodosBtn = document.getElementById("export-todos-btn") // Added export todos button
+const importFile = document.getElementById("import-file") // Added import file
 
 // Task arrays
 let unscheduledTasks = []
@@ -432,13 +439,6 @@ function resetTaskForm() {
 }
 
 // Settings functionality
-const settingsBtn = document.getElementById("settings-btn")
-const settingsModal = document.getElementById("settings-modal")
-const closeModalBtn = document.getElementById("close-modal-btn")
-const newSessionBtn = document.getElementById("new-session-btn")
-const importTodosBtn = document.getElementById("import-todos-btn")
-const exportTodosBtn = document.getElementById("export-todos-btn")
-const importFile = document.getElementById("import-file")
 
 settingsBtn.addEventListener("click", () => {
   settingsModal.style.display = "block"
