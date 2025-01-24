@@ -69,7 +69,7 @@ const categoryList = document.getElementById("category-list")
 let unscheduledTasks = []
 let todaysTasks = []
 let completedTasks = []
-let categories = ["Work", "Chore", "Band", "School", "Family", "Other"]
+let categories = ["Work", "Choir", "Band", "School", "Family", "Other"]
 
 // Load tasks and categories from localStorage
 function loadData() {
@@ -136,7 +136,7 @@ function createTaskElement(task, index, listType) {
   const priorityEmoji = task.priority === "High" ? "🔴" : task.priority === "Medium" ? "🟡" : "🟢"
   li.innerHTML = `
         <div class="task-main">
-            <span>${listType === "today" ? priorityEmoji : ""} ${task.title}</span>
+            <span class="task-title">${task.title}</span>
             <div class="task-actions">
                 ${listType === "unscheduled" ? `<button onclick="addToToday(${index})">Add to Today</button>` : ""}
                 ${
@@ -155,7 +155,7 @@ function createTaskElement(task, index, listType) {
             </div>
         </div>
         <div class="task-meta">
-            Priority: ${task.priority} | Category: ${task.category}
+            ${priorityEmoji} ${task.priority} | ${task.category}
         </div>
     `
   li.draggable = true
@@ -181,6 +181,7 @@ function addTask(event) {
   saveData()
   renderTasks()
   taskForm.reset()
+  taskPriority.value = "Medium"
 }
 
 // Add task to today's list
@@ -415,5 +416,6 @@ function resetTaskForm() {
   document.getElementById("update-task-btn").style.display = "none"
   document.getElementById("delete-task-btn").style.display = "none"
   document.getElementById("cancel-edit-btn").style.display = "none"
+  taskPriority.value = "Medium"
 }
 
