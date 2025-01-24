@@ -26,20 +26,20 @@
                     <option value="High">High</option>
                 </select>
                 <select id="task-category" required>
-                    <option value="Other">Other</option>
-                    <option value="Work">Work</option>
-                    <option value="Chore">Chore</option>
-                    <option value="Band">Band</option>
-                    <option value="School">School</option>
-                    <option value="Family">Family</option>
                 </select>
-                <textarea id="task-notes" placeholder="Additional Notes"></textarea>
                 <button type="submit">Create Task</button>
             </form>
-            <h2>All Tasks</h2>
-            <ul id="all-tasks" class="task-list"></ul>
+            <h2>Manage Categories</h2>
+            <form id="category-form">
+                <input type="text" id="new-category" placeholder="New Category Name" required>
+                <button type="submit">Add Category</button>
+            </form>
+            <ul id="category-list"></ul>
+            <h2>Unscheduled Tasks</h2>
+            <ul id="unscheduled-tasks" class="task-list"></ul>
         </div>
     </div>
     <script src="app.js"></script>
 </body>
 </html>
+
