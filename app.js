@@ -106,28 +106,40 @@ function renderTasks() {
 // Render unscheduled tasks
 function renderUnscheduledTasks() {
   unscheduledTasksList.innerHTML = ""
-  unscheduledTasks.forEach((task, index) => {
-    const li = createTaskElement(task, index, "unscheduled")
-    unscheduledTasksList.appendChild(li)
-  })
+  if (unscheduledTasks.length === 0) {
+    unscheduledTasksList.innerHTML = '<p class="no-tasks">No unscheduled tasks</p>'
+  } else {
+    unscheduledTasks.forEach((task, index) => {
+      const li = createTaskElement(task, index, "unscheduled")
+      unscheduledTasksList.appendChild(li)
+    })
+  }
 }
 
 // Render today's tasks
 function renderTodaysTasks() {
   todaysTasksList.innerHTML = ""
-  todaysTasks.forEach((task, index) => {
-    const li = createTaskElement(task, index, "today")
-    todaysTasksList.appendChild(li)
-  })
+  if (todaysTasks.length === 0) {
+    todaysTasksList.innerHTML = '<p class="no-tasks">No tasks for today</p>'
+  } else {
+    todaysTasks.forEach((task, index) => {
+      const li = createTaskElement(task, index, "today")
+      todaysTasksList.appendChild(li)
+    })
+  }
 }
 
 // Render completed tasks
 function renderCompletedTasks() {
   completedTasksList.innerHTML = ""
-  completedTasks.forEach((task, index) => {
-    const li = createTaskElement(task, index, "completed")
-    completedTasksList.appendChild(li)
-  })
+  if (completedTasks.length === 0) {
+    completedTasksList.innerHTML = '<p class="no-tasks">No completed tasks</p>'
+  } else {
+    completedTasks.forEach((task, index) => {
+      const li = createTaskElement(task, index, "completed")
+      completedTasksList.appendChild(li)
+    })
+  }
 }
 
 // Create a task element
@@ -417,5 +429,81 @@ function resetTaskForm() {
   document.getElementById("delete-task-btn").style.display = "none"
   document.getElementById("cancel-edit-btn").style.display = "none"
   taskPriority.value = "Medium"
+}
+
+// Settings functionality
+const settingsBtn = document.getElementById("settings-btn")
+const settingsModal = document.getElementById("settings-modal")
+const closeModalBtn = document.getElementById("close-modal-btn")
+const newSessionBtn = document.getElementById("new-session-btn")
+const importTodosBtn = document.getElementById("import-todos-btn")
+const exportTodosBtn = document.getElementById("export-todos-btn")
+const importFile = document.getElementById("import-file")
+
+settingsBtn.addEventListener("click", () => {
+  settingsModal.style.display = "block"
+})
+
+closeModalBtn.addEventListener("click", () => {
+  settingsModal.style.display = "none"
+})
+
+newSessionBtn.addEventListener("click", () => {
+  if (confirm("Are you sure you want to start a new session? This will clear all current tasks.")) {
+    localStorage.clear()
+    location.reload()
+  }
+})
+
+importTodosBtn.addEventListener("click", () => {
+  importFile.click()
+})
+
+importFile.addEventListener("change", (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const content = e.target.result
+      try {
+        const importedData = JSON.parse(content)
+        unscheduledTasks = importedData.unscheduledTasks || []
+        todaysTasks = importedData.todaysTasks || []
+        completedTasks = importedData.completedTasks || []
+        categories = importedData.categories || []
+        saveData()
+        renderTasks()
+        renderCategories()
+        alert("Tasks imported successfully!")
+      } catch (error) {
+        alert("Error importing tasks. Please make sure the file is in the correct format.")
+      }
+    }
+    reader.readAsText(file)
+  }
+})
+
+exportTodosBtn.addEventListener("click", () => {
+  const exportData = {
+    unscheduledTasks,
+    todaysTasks,
+    completedTasks,
+    categories,
+  }
+  const dataStr = JSON.stringify(exportData)
+  const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr)
+  const exportFileDefaultName = "tasks.json"
+
+  const linkElement = document.createElement("a")
+  linkElement.setAttribute("href", dataUri)
+  linkElement.setAttribute("download", exportFileDefaultName)
+  linkElement.click()
+})
+
+// Update window click event to close modal
+window.onclick = (event) => {
+  if (event.target == settingsModal) {
+    settingsModal.style.display = "none"
+  }
 }
 
