@@ -1,243 +1,331 @@
 // Task Management App
 
 // DOM Elements
-const taskForm = document.getElementById('task-form');
-const taskTitle = document.getElementById('task-title');
-const taskPriority = document.getElementById('task-priority');
-const taskCategory = document.getElementById('task-category');
-const taskNotes = document.getElementById('task-notes');
-const allTasksList = document.getElementById('all-tasks');
-const todaysTasksList = document.getElementById('todays-tasks');
-const completedTasksList = document.getElementById('completed-tasks');
-const clearCompletedBtn = document.getElementById('clear-completed');
+const taskForm = document.getElementById("task-form")
+const taskTitle = document.getElementById("task-title")
+const taskPriority = document.getElementById("task-priority")
+const taskCategory = document.getElementById("task-category")
+const unscheduledTasksList = document.getElementById("unscheduled-tasks")
+const todaysTasksList = document.getElementById("todays-tasks")
+const completedTasksList = document.getElementById("completed-tasks")
+const clearCompletedBtn = document.getElementById("clear-completed")
+const categoryForm = document.getElementById("category-form")
+const newCategoryInput = document.getElementById("new-category")
+const categoryList = document.getElementById("category-list")
 
 // Task arrays
-let allTasks = [];
-let todaysTasks = [];
-let completedTasks = [];
+let unscheduledTasks = []
+let todaysTasks = []
+let completedTasks = []
+let categories = ["Work", "Chore", "Band", "School", "Family", "Other"]
 
-// Load tasks from localStorage
-function loadTasks() {
-    const savedAllTasks = localStorage.getItem('allTasks');
-    const savedTodaysTasks = localStorage.getItem('todaysTasks');
-    const savedCompletedTasks = localStorage.getItem('completedTasks');
+// Load tasks and categories from localStorage
+function loadData() {
+  const savedUnscheduledTasks = localStorage.getItem("unscheduledTasks")
+  const savedTodaysTasks = localStorage.getItem("todaysTasks")
+  const savedCompletedTasks = localStorage.getItem("completedTasks")
+  const savedCategories = localStorage.getItem("categories")
 
-    if (savedAllTasks) allTasks = JSON.parse(savedAllTasks);
-    if (savedTodaysTasks) todaysTasks = JSON.parse(savedTodaysTasks);
-    if (savedCompletedTasks) completedTasks = JSON.parse(savedCompletedTasks);
+  if (savedUnscheduledTasks) unscheduledTasks = JSON.parse(savedUnscheduledTasks)
+  if (savedTodaysTasks) todaysTasks = JSON.parse(savedTodaysTasks)
+  if (savedCompletedTasks) completedTasks = JSON.parse(savedCompletedTasks)
+  if (savedCategories) categories = JSON.parse(savedCategories)
 
-    renderTasks();
+  renderTasks()
+  renderCategories()
 }
 
-// Save tasks to localStorage
-function saveTasks() {
-    localStorage.setItem('allTasks', JSON.stringify(allTasks));
-    localStorage.setItem('todaysTasks', JSON.stringify(todaysTasks));
-    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+// Save tasks and categories to localStorage
+function saveData() {
+  localStorage.setItem("unscheduledTasks", JSON.stringify(unscheduledTasks))
+  localStorage.setItem("todaysTasks", JSON.stringify(todaysTasks))
+  localStorage.setItem("completedTasks", JSON.stringify(completedTasks))
+  localStorage.setItem("categories", JSON.stringify(categories))
 }
 
 // Render tasks in the respective lists
 function renderTasks() {
-    renderAllTasks();
-    renderTodaysTasks();
-    renderCompletedTasks();
+  renderUnscheduledTasks()
+  renderTodaysTasks()
+  renderCompletedTasks()
 }
 
-// Render all tasks
-function renderAllTasks() {
-    allTasksList.innerHTML = '';
-    allTasks.forEach((task, index) => {
-        const li = createTaskElement(task, index, 'all');
-        allTasksList.appendChild(li);
-    });
+// Render unscheduled tasks
+function renderUnscheduledTasks() {
+  unscheduledTasksList.innerHTML = ""
+  unscheduledTasks.forEach((task, index) => {
+    const li = createTaskElement(task, index, "unscheduled")
+    unscheduledTasksList.appendChild(li)
+  })
 }
 
 // Render today's tasks
 function renderTodaysTasks() {
-    todaysTasksList.innerHTML = '';
-    todaysTasks.forEach((task, index) => {
-        const li = createTaskElement(task, index, 'today');
-        todaysTasksList.appendChild(li);
-    });
+  todaysTasksList.innerHTML = ""
+  todaysTasks.forEach((task, index) => {
+    const li = createTaskElement(task, index, "today")
+    todaysTasksList.appendChild(li)
+  })
 }
 
 // Render completed tasks
 function renderCompletedTasks() {
-    completedTasksList.innerHTML = '';
-    completedTasks.forEach((task, index) => {
-        const li = createTaskElement(task, index, 'completed');
-        completedTasksList.appendChild(li);
-    });
+  completedTasksList.innerHTML = ""
+  completedTasks.forEach((task, index) => {
+    const li = createTaskElement(task, index, "completed")
+    completedTasksList.appendChild(li)
+  })
 }
 
 // Create a task element
 function createTaskElement(task, index, listType) {
-    const li = document.createElement('li');
-    li.innerHTML = `
-        <span>${task.title} (${task.priority} - ${task.category})</span>
+  const li = document.createElement("li")
+  const priorityEmoji = task.priority === "High" ? "🔴" : task.priority === "Medium" ? "🟡" : "🟢"
+  li.innerHTML = `
+        <span>${listType === "today" ? priorityEmoji : ""} ${task.title} (${task.priority} - ${task.category})</span>
         <div class="task-actions">
-            ${listType === 'all' ? `<button onclick="addToToday(${index})">Add to Today</button>` : ''}
-            ${listType === 'today' ? `
+            ${listType === "unscheduled" ? `<button onclick="addToToday(${index})">Add to Today</button>` : ""}
+            ${
+              listType === "today"
+                ? `
                 <button onclick="moveUp(${index})">↑</button>
                 <button onclick="moveDown(${index})">↓</button>
                 <button onclick="completeTask(${index})">Complete</button>
-            ` : ''}
-            ${listType === 'completed' ? `<button onclick="removeCompleted(${index})">Remove</button>` : ''}
+            `
+                : ""
+            }
+            ${listType === "completed" ? `<button onclick="removeCompleted(${index})">Remove</button>` : ""}
             <button onclick="editTask(${index}, '${listType}')">Edit</button>
-            ${listType === 'all' ? `<button onclick="deleteTask(${index})">Delete</button>` : ''}
+            ${listType === "unscheduled" ? `<button onclick="deleteTask(${index})">Delete</button>` : ""}
         </div>
-    `;
-    li.draggable = true;
-    li.addEventListener('dragstart', dragStart);
-    li.addEventListener('dragover', dragOver);
-    li.addEventListener('drop', drop);
-    return li;
+    `
+  li.draggable = true
+  li.addEventListener("dragstart", dragStart)
+  li.addEventListener("dragover", dragOver)
+  li.addEventListener("drop", drop)
+  return li
 }
 
 // Add a new task
 function addTask(event) {
-    event.preventDefault();
-    if (!taskTitle.value || !taskPriority.value || !taskCategory.value) {
-        alert('Please fill in all required fields.');
-        return;
-    }
-    const newTask = {
-        title: taskTitle.value,
-        priority: taskPriority.value,
-        category: taskCategory.value,
-        notes: taskNotes.value
-    };
-    allTasks.push(newTask);
-    saveTasks();
-    renderTasks();
-    taskForm.reset();
+  event.preventDefault()
+  if (!taskTitle.value || !taskPriority.value || !taskCategory.value) {
+    alert("Please fill in all required fields.")
+    return
+  }
+  const newTask = {
+    title: taskTitle.value,
+    priority: taskPriority.value,
+    category: taskCategory.value,
+  }
+  unscheduledTasks.push(newTask)
+  saveData()
+  renderTasks()
+  taskForm.reset()
 }
 
 // Add task to today's list
 function addToToday(index) {
-    const task = allTasks[index];
-    if (!todaysTasks.some(t => t.title === task.title)) {
-        todaysTasks.push(task);
-        saveTasks();
-        renderTasks();
-    } else {
-        alert('This task is already in Today\'s To-Do\'s.');
-    }
+  const task = unscheduledTasks[index]
+  if (!todaysTasks.some((t) => t.title === task.title)) {
+    todaysTasks.push(task)
+    unscheduledTasks.splice(index, 1)
+    saveData()
+    renderTasks()
+  } else {
+    alert("This task is already in Today's To-Do's.")
+  }
 }
 
 // Move task up in today's list
 function moveUp(index) {
-    if (index > 0) {
-        [todaysTasks[index], todaysTasks[index - 1]] = [todaysTasks[index - 1], todaysTasks[index]];
-        saveTasks();
-        renderTodaysTasks();
-    }
+  if (index > 0) {
+    ;[todaysTasks[index], todaysTasks[index - 1]] = [todaysTasks[index - 1], todaysTasks[index]]
+    saveData()
+    renderTodaysTasks()
+  }
 }
 
 // Move task down in today's list
 function moveDown(index) {
-    if (index < todaysTasks.length - 1) {
-        [todaysTasks[index], todaysTasks[index + 1]] = [todaysTasks[index + 1], todaysTasks[index]];
-        saveTasks();
-        renderTodaysTasks();
-    }
+  if (index < todaysTasks.length - 1) {
+    ;[todaysTasks[index], todaysTasks[index + 1]] = [todaysTasks[index + 1], todaysTasks[index]]
+    saveData()
+    renderTodaysTasks()
+  }
 }
 
 // Complete a task
 function completeTask(index) {
-    const task = todaysTasks.splice(index, 1)[0];
-    completedTasks.push(task);
-    saveTasks();
-    renderTasks();
+  const task = todaysTasks.splice(index, 1)[0]
+  completedTasks.push(task)
+  saveData()
+  renderTasks()
 }
 
 // Remove a completed task
 function removeCompleted(index) {
-    completedTasks.splice(index, 1);
-    saveTasks();
-    renderCompletedTasks();
+  completedTasks.splice(index, 1)
+  saveData()
+  renderCompletedTasks()
 }
 
 // Clear all completed tasks
 function clearAllCompleted() {
-    completedTasks = [];
-    saveTasks();
-    renderCompletedTasks();
+  completedTasks = []
+  saveData()
+  renderCompletedTasks()
 }
 
 // Edit a task
 function editTask(index, listType) {
-    let task;
-    if (listType === 'all') {
-        task = allTasks[index];
-    } else if (listType === 'today') {
-        task = todaysTasks[index];
-    } else {
-        task = completedTasks[index];
-    }
+  let task
+  if (listType === "unscheduled") {
+    task = unscheduledTasks[index]
+  } else if (listType === "today") {
+    task = todaysTasks[index]
+  } else {
+    task = completedTasks[index]
+  }
 
-    taskTitle.value = task.title;
-    taskPriority.value = task.priority;
-    taskCategory.value = task.category;
-    taskNotes.value = task.notes;
+  taskTitle.value = task.title
+  taskPriority.value = task.priority
+  taskCategory.value = task.category
 
-    const updateButton = document.createElement('button');
-    updateButton.textContent = 'Update Task';
-    updateButton.onclick = function() {
-        task.title = taskTitle.value;
-        task.priority = taskPriority.value;
-        task.category = taskCategory.value;
-        task.notes = taskNotes.value;
+  const updateButton = document.createElement("button")
+  updateButton.textContent = "Update Task"
+  updateButton.onclick = (e) => {
+    e.preventDefault()
+    task.title = taskTitle.value
+    task.priority = taskPriority.value
+    task.category = taskCategory.value
 
-        saveTasks();
-        renderTasks();
-        taskForm.removeChild(updateButton);
-        taskForm.reset();
-    };
+    saveData()
+    renderTasks()
+    taskForm.removeChild(updateButton)
+    taskForm.reset()
+  }
 
-    taskForm.appendChild(updateButton);
+  taskForm.appendChild(updateButton)
 }
 
 // Delete a task
 function deleteTask(index) {
-    allTasks.splice(index, 1);
-    saveTasks();
-    renderAllTasks();
+  unscheduledTasks.splice(index, 1)
+  saveData()
+  renderUnscheduledTasks()
 }
 
 // Drag and drop functionality
 function dragStart(e) {
-    e.dataTransfer.setData('text/plain', e.target.innerHTML);
-    e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData("text/plain", e.target.innerHTML)
+  e.dataTransfer.effectAllowed = "move"
 }
 
 function dragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+  e.preventDefault()
+  e.dataTransfer.dropEffect = "move"
 }
 
 function drop(e) {
-    e.preventDefault();
-    const data = e.dataTransfer.getData('text');
-    const draggedElement = document.querySelector(`li:contains('${data}')`);
-    const dropTarget = e.target.closest('li');
+  e.preventDefault()
+  const data = e.dataTransfer.getData("text")
+  const draggedElement = document.querySelector(`li:contains('${data}')`)
+  const dropTarget = e.target.closest("li")
 
-    if (draggedElement && dropTarget && draggedElement !== dropTarget) {
-        const list = dropTarget.parentNode;
-        const fromIndex = Array.from(list.children).indexOf(draggedElement);
-        const toIndex = Array.from(list.children).indexOf(dropTarget);
+  if (draggedElement && dropTarget && draggedElement !== dropTarget) {
+    const list = dropTarget.parentNode
+    const fromIndex = Array.from(list.children).indexOf(draggedElement)
+    const toIndex = Array.from(list.children).indexOf(dropTarget)
 
-        if (list.id === 'todays-tasks') {
-            [todaysTasks[fromIndex], todaysTasks[toIndex]] = [todaysTasks[toIndex], todaysTasks[fromIndex]];
-            saveTasks();
-            renderTodaysTasks();
-        }
+    if (list.id === "todays-tasks") {
+      ;[todaysTasks[fromIndex], todaysTasks[toIndex]] = [todaysTasks[toIndex], todaysTasks[fromIndex]]
+      saveData()
+      renderTodaysTasks()
     }
+  }
+}
+
+// Render categories
+function renderCategories() {
+  taskCategory.innerHTML = ""
+  categoryList.innerHTML = ""
+  categories.forEach((category, index) => {
+    const option = document.createElement("option")
+    option.value = category
+    option.textContent = category
+    taskCategory.appendChild(option)
+
+    const li = document.createElement("li")
+    li.innerHTML = `
+            ${category}
+            <div>
+                <button onclick="moveCategoryUp(${index})">↑</button>
+                <button onclick="moveCategoryDown(${index})">↓</button>
+                <button onclick="deleteCategory(${index})">Delete</button>
+            </div>
+        `
+    categoryList.appendChild(li)
+  })
+}
+
+// Add new category
+function addCategory(event) {
+  event.preventDefault()
+  const newCategory = newCategoryInput.value.trim()
+  if (newCategory && !categories.includes(newCategory)) {
+    categories.push(newCategory)
+    saveData()
+    renderCategories()
+    newCategoryInput.value = ""
+  } else {
+    alert("Please enter a unique category name.")
+  }
+}
+
+// Move category up
+function moveCategoryUp(index) {
+  if (index > 0) {
+    ;[categories[index], categories[index - 1]] = [categories[index - 1], categories[index]]
+    saveData()
+    renderCategories()
+  }
+}
+
+// Move category down
+function moveCategoryDown(index) {
+  if (index < categories.length - 1) {
+    ;[categories[index], categories[index + 1]] = [categories[index + 1], categories[index]]
+    saveData()
+    renderCategories()
+  }
+}
+
+// Delete category
+function deleteCategory(index) {
+  const category = categories[index]
+  const tasksWithCategory = [...unscheduledTasks, ...todaysTasks, ...completedTasks].filter(
+    (task) => task.category === category,
+  )
+
+  if (tasksWithCategory.length > 0) {
+    alert(`Cannot delete category "${category}" as it is being used by existing tasks.`)
+    return
+  }
+
+  categories.splice(index, 1)
+  saveData()
+  renderCategories()
 }
 
 // Event listeners
-taskForm.addEventListener('submit', addTask);
-clearCompletedBtn.addEventListener('click', clearAllCompleted);
+taskForm.addEventListener("submit", addTask)
+clearCompletedBtn.addEventListener("click", clearAllCompleted)
+categoryForm.addEventListener("submit", addCategory)
 
 // Initial load
-loadTasks();
+loadData()
+
+// Set default category to "Work"
+taskCategory.value = "Work"
+
