@@ -162,12 +162,20 @@ button:hover {
   font-size: 15px;
 }
 
+.collapsible .collapse-btn:hover {
+  background-color: #80bfff;
+}
+
 .collapsible .collapse-content {
   padding: 0 18px;
-  background-color: white;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
+  background-color: var(--primary-color);
+}
+
+.collapsible .collapse-content.active {
+  max-height: 500px; /* Adjust this value as needed */
 }
 
 #category-list {
