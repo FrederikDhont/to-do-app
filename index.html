@@ -8,26 +8,26 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="left-panel">
+        <div class="panel left-panel">
             <div class="section-header">
-                <h2>Today's To-Do's</h2>
+                <h2>Today's Tasks</h2>
                 <button id="sort-tasks">Sort</button>
             </div>
             <ul id="todays-tasks" class="task-list"></ul>
             <h2>Completed Tasks</h2>
             <ul id="completed-tasks" class="task-list"></ul>
             <button id="clear-completed">Clear All Completed</button>
-            <h2>Unscheduled Tasks</h2>
+            <h2 class="unscheduled-header">Unscheduled Tasks</h2>
             <ul id="unscheduled-tasks" class="task-list"></ul>
         </div>
-        <div class="right-panel">
+        <div class="panel right-panel">
             <h2 id="task-form-title">Create New Task</h2>
             <form id="task-form">
                 <input type="text" id="task-title" placeholder="Task Title" required>
                 <select id="task-priority" required>
                     <option value="">Select Priority</option>
                     <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
+                    <option value="Medium" selected>Medium</option>
                     <option value="High">High</option>
                 </select>
                 <select id="task-category" required>
