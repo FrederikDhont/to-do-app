@@ -1,243 +1,236 @@
-// Task Management App
+// Task Management Application
+
+// State Management
+let tasks = [];
+let editingTaskId = null;
 
 // DOM Elements
 const taskForm = document.getElementById('task-form');
-const taskTitle = document.getElementById('task-title');
-const taskPriority = document.getElementById('task-priority');
-const taskCategory = document.getElementById('task-category');
-const taskNotes = document.getElementById('task-notes');
-const allTasksList = document.getElementById('all-tasks');
-const todaysTasksList = document.getElementById('todays-tasks');
-const completedTasksList = document.getElementById('completed-tasks');
-const clearCompletedBtn = document.getElementById('clear-completed');
+const taskList = document.getElementById('task-list');
+const todayTaskList = document.getElementById('today-task-list');
+const completedTaskList = document.getElementById('completed-task-list');
+const createTaskBtn = document.getElementById('create-task-btn');
+const updateTaskBtn = document.getElementById('update-task-btn');
+const clearCompletedBtn = document.getElementById('clear-completed-btn');
 
-// Task arrays
-let allTasks = [];
-let todaysTasks = [];
-let completedTasks = [];
+// Event Listeners
+document.addEventListener('DOMContentLoaded', initializeApp);
+taskForm.addEventListener('submit', handleTaskCreation);
+updateTaskBtn.addEventListener('click', updateTask);
+clearCompletedBtn.addEventListener('click', clearAllCompletedTasks);
 
-// Load tasks from localStorage
-function loadTasks() {
-    const savedAllTasks = localStorage.getItem('allTasks');
-    const savedTodaysTasks = localStorage.getItem('todaysTasks');
-    const savedCompletedTasks = localStorage.getItem('completedTasks');
-
-    if (savedAllTasks) allTasks = JSON.parse(savedAllTasks);
-    if (savedTodaysTasks) todaysTasks = JSON.parse(savedTodaysTasks);
-    if (savedCompletedTasks) completedTasks = JSON.parse(savedCompletedTasks);
-
-    renderTasks();
-}
-
-// Save tasks to localStorage
-function saveTasks() {
-    localStorage.setItem('allTasks', JSON.stringify(allTasks));
-    localStorage.setItem('todaysTasks', JSON.stringify(todaysTasks));
-    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
-}
-
-// Render tasks in the respective lists
-function renderTasks() {
+// Initialize Application
+function initializeApp() {
+    const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    tasks = storedTasks;
     renderAllTasks();
-    renderTodaysTasks();
-    renderCompletedTasks();
 }
 
-// Render all tasks
-function renderAllTasks() {
-    allTasksList.innerHTML = '';
-    allTasks.forEach((task, index) => {
-        const li = createTaskElement(task, index, 'all');
-        allTasksList.appendChild(li);
-    });
-}
-
-// Render today's tasks
-function renderTodaysTasks() {
-    todaysTasksList.innerHTML = '';
-    todaysTasks.forEach((task, index) => {
-        const li = createTaskElement(task, index, 'today');
-        todaysTasksList.appendChild(li);
-    });
-}
-
-// Render completed tasks
-function renderCompletedTasks() {
-    completedTasksList.innerHTML = '';
-    completedTasks.forEach((task, index) => {
-        const li = createTaskElement(task, index, 'completed');
-        completedTasksList.appendChild(li);
-    });
-}
-
-// Create a task element
-function createTaskElement(task, index, listType) {
-    const li = document.createElement('li');
-    li.innerHTML = `
-        <span>${task.title} (${task.priority} - ${task.category})</span>
-        <div class="task-actions">
-            ${listType === 'all' ? `<button onclick="addToToday(${index})">Add to Today</button>` : ''}
-            ${listType === 'today' ? `
-                <button onclick="moveUp(${index})">↑</button>
-                <button onclick="moveDown(${index})">↓</button>
-                <button onclick="completeTask(${index})">Complete</button>
-            ` : ''}
-            ${listType === 'completed' ? `<button onclick="removeCompleted(${index})">Remove</button>` : ''}
-            <button onclick="editTask(${index}, '${listType}')">Edit</button>
-            ${listType === 'all' ? `<button onclick="deleteTask(${index})">Delete</button>` : ''}
-        </div>
-    `;
-    li.draggable = true;
-    li.addEventListener('dragstart', dragStart);
-    li.addEventListener('dragover', dragOver);
-    li.addEventListener('drop', drop);
-    return li;
-}
-
-// Add a new task
-function addTask(event) {
+// Task Creation
+function handleTaskCreation(event) {
     event.preventDefault();
-    if (!taskTitle.value || !taskPriority.value || !taskCategory.value) {
-        alert('Please fill in all required fields.');
+    
+    const title = document.getElementById('task-title').value;
+    const priority = document.getElementById('task-priority').value;
+    const category = document.getElementById('task-category').value;
+    const notes = document.getElementById('task-notes').value;
+
+    if (!title || !priority || !category) {
+        alert('Please fill in all required fields');
         return;
     }
+
     const newTask = {
-        title: taskTitle.value,
-        priority: taskPriority.value,
-        category: taskCategory.value,
-        notes: taskNotes.value
+        id: Date.now(),
+        title,
+        priority,
+        category,
+        notes,
+        isInToday: false,
+        isCompleted: false
     };
-    allTasks.push(newTask);
+
+    tasks.push(newTask);
     saveTasks();
-    renderTasks();
+    renderAllTasks();
     taskForm.reset();
 }
 
-// Add task to today's list
-function addToToday(index) {
-    const task = allTasks[index];
-    if (!todaysTasks.some(t => t.title === task.title)) {
-        todaysTasks.push(task);
-        saveTasks();
-        renderTasks();
-    } else {
-        alert('This task is already in Today\'s To-Do\'s.');
+// Task Rendering
+function renderAllTasks() {
+    taskList.innerHTML = '';
+    todayTaskList.innerHTML = '';
+    completedTaskList.innerHTML = '';
+
+    tasks.forEach(task => {
+        if (task.isCompleted) {
+            renderCompletedTask(task);
+        } else if (task.isInToday) {
+            renderTodayTask(task);
+        } else {
+            renderTask(task);
+        }
+    });
+
+    saveTasks();
+}
+
+function renderTask(task) {
+    const taskElement = document.createElement('div');
+    taskElement.className = 'task-item';
+    taskElement.draggable = true;
+    taskElement.dataset.taskId = task.id;
+
+    taskElement.innerHTML = `
+        <span>${task.title} (${task.priority} - ${task.category})</span>
+        <div class="task-actions">
+            <button onclick="editTask(${task.id})">Edit</button>
+            <button onclick="deleteTask(${task.id})">Delete</button>
+            <button onclick="addToToday(${task.id})">Add to Today</button>
+        </div>
+    `;
+
+    taskElement.addEventListener('dragstart', drag);
+    taskList.appendChild(taskElement);
+}
+
+function renderTodayTask(task) {
+    const taskElement = document.createElement('div');
+    taskElement.className = 'task-item';
+    taskElement.draggable = true;
+    taskElement.dataset.taskId = task.id;
+
+    taskElement.innerHTML = `
+        <span>${task.title} (${task.priority} - ${task.category})</span>
+        <div class="task-actions">
+            <button onclick="moveTaskUp(${task.id})">↑</button>
+            <button onclick="moveTaskDown(${task.id})">↓</button>
+            <button onclick="completeTask(${task.id})">Complete</button>
+        </div>
+    `;
+
+    taskElement.addEventListener('dragstart', drag);
+    todayTaskList.appendChild(taskElement);
+}
+
+function renderCompletedTask(task) {
+    const taskElement = document.createElement('div');
+    taskElement.className = 'task-item completed';
+    taskElement.dataset.taskId = task.id;
+
+    taskElement.innerHTML = `
+        <span>${task.title} (${task.priority} - ${task.category})</span>
+        <button onclick="removeCompletedTask(${task.id})">Remove</button>
+    `;
+
+    completedTaskList.appendChild(taskElement);
+}
+
+// Task Management Functions
+function addToToday(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task && !task.isInToday) {
+        task.isInToday = true;
+        renderAllTasks();
     }
 }
 
-// Move task up in today's list
-function moveUp(index) {
-    if (index > 0) {
-        [todaysTasks[index], todaysTasks[index - 1]] = [todaysTasks[index - 1], todaysTasks[index]];
-        saveTasks();
-        renderTodaysTasks();
+function completeTask(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+        task.isCompleted = true;
+        task.isInToday = false;
+        renderAllTasks();
     }
 }
 
-// Move task down in today's list
-function moveDown(index) {
-    if (index < todaysTasks.length - 1) {
-        [todaysTasks[index], todaysTasks[index + 1]] = [todaysTasks[index + 1], todaysTasks[index]];
-        saveTasks();
-        renderTodaysTasks();
-    }
-}
-
-// Complete a task
-function completeTask(index) {
-    const task = todaysTasks.splice(index, 1)[0];
-    completedTasks.push(task);
-    saveTasks();
-    renderTasks();
-}
-
-// Remove a completed task
-function removeCompleted(index) {
-    completedTasks.splice(index, 1);
-    saveTasks();
-    renderCompletedTasks();
-}
-
-// Clear all completed tasks
-function clearAllCompleted() {
-    completedTasks = [];
-    saveTasks();
-    renderCompletedTasks();
-}
-
-// Edit a task
-function editTask(index, listType) {
-    let task;
-    if (listType === 'all') {
-        task = allTasks[index];
-    } else if (listType === 'today') {
-        task = todaysTasks[index];
-    } else {
-        task = completedTasks[index];
-    }
-
-    taskTitle.value = task.title;
-    taskPriority.value = task.priority;
-    taskCategory.value = task.category;
-    taskNotes.value = task.notes;
-
-    const updateButton = document.createElement('button');
-    updateButton.textContent = 'Update Task';
-    updateButton.onclick = function() {
-        task.title = taskTitle.value;
-        task.priority = taskPriority.value;
-        task.category = taskCategory.value;
-        task.notes = taskNotes.value;
-
-        saveTasks();
-        renderTasks();
-        taskForm.removeChild(updateButton);
-        taskForm.reset();
-    };
-
-    taskForm.appendChild(updateButton);
-}
-
-// Delete a task
-function deleteTask(index) {
-    allTasks.splice(index, 1);
-    saveTasks();
+function removeCompletedTask(taskId) {
+    tasks = tasks.filter(t => t.id !== taskId);
     renderAllTasks();
 }
 
-// Drag and drop functionality
-function dragStart(e) {
-    e.dataTransfer.setData('text/plain', e.target.innerHTML);
-    e.dataTransfer.effectAllowed = 'move';
+function clearAllCompletedTasks() {
+    tasks = tasks.filter(t => !t.isCompleted);
+    renderAllTasks();
 }
 
-function dragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-}
+function editTask(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+        document.getElementById('task-title').value = task.title;
+        document.getElementById('task-priority').value = task.priority;
+        document.getElementById('task-category').value = task.category;
+        document.getElementById('task-notes').value = task.notes;
 
-function drop(e) {
-    e.preventDefault();
-    const data = e.dataTransfer.getData('text');
-    const draggedElement = document.querySelector(`li:contains('${data}')`);
-    const dropTarget = e.target.closest('li');
-
-    if (draggedElement && dropTarget && draggedElement !== dropTarget) {
-        const list = dropTarget.parentNode;
-        const fromIndex = Array.from(list.children).indexOf(draggedElement);
-        const toIndex = Array.from(list.children).indexOf(dropTarget);
-
-        if (list.id === 'todays-tasks') {
-            [todaysTasks[fromIndex], todaysTasks[toIndex]] = [todaysTasks[toIndex], todaysTasks[fromIndex]];
-            saveTasks();
-            renderTodaysTasks();
-        }
+        createTaskBtn.style.display = 'none';
+        updateTaskBtn.style.display = 'block';
+        editingTaskId = taskId;
     }
 }
 
-// Event listeners
-taskForm.addEventListener('submit', addTask);
-clearCompletedBtn.addEventListener('click', clearAllCompleted);
+function updateTask() {
+    const task = tasks.find(t => t.id === editingTaskId);
+    if (task) {
+        task.title = document.getElementById('task-title').value;
+        task.priority = document.getElementById('task-priority').value;
+        task.category = document.getElementById('task-category').value;
+        task.notes = document.getElementById('task-notes').value;
 
-// Initial load
-loadTasks();
+        createTaskBtn.style.display = 'block';
+        updateTaskBtn.style.display = 'none';
+        renderAllTasks();
+        taskForm.reset();
+        editingTaskId = null;
+    }
+}
+
+function deleteTask(taskId) {
+    tasks = tasks.filter(t => t.id !== taskId);
+    renderAllTasks();
+}
+
+// Drag and Drop Functionality
+function drag(event) {
+    event.dataTransfer.setData('text/plain', event.target.dataset.taskId);
+}
+
+function allowDrop(event) {
+    event.preventDefault();
+}
+
+function drop(event) {
+    event.preventDefault();
+    const taskId = parseInt(event.dataTransfer.getData('text/plain'));
+    const task = tasks.find(t => t.id === taskId);
+
+    if (event.target.closest('#today-task-list') && task && !task.isInToday) {
+        task.isInToday = true;
+        renderAllTasks();
+    }
+}
+
+// Task Reordering
+function moveTaskUp(taskId) {
+    const todayTasks = tasks.filter(t => t.isInToday && !t.isCompleted);
+    const index = todayTasks.findIndex(t => t.id === taskId);
+    
+    if (index > 0) {
+        [todayTasks[index], todayTasks[index - 1]] = [todayTasks[index - 1], todayTasks[index]];
+        renderAllTasks();
+    }
+}
+
+function moveTaskDown(taskId) {
+    const todayTasks = tasks.filter(t => t.isInToday && !t.isCompleted);
+    const index = todayTasks.findIndex(t => t.id === taskId);
+    
+    if (index < todayTasks.length - 1) {
+        [todayTasks[index], todayTasks[index + 1]] = [todayTasks[index + 1], todayTasks[index]];
+        renderAllTasks();
+    }
+}
+
+// Persistence
+function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
