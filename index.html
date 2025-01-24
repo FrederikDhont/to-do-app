@@ -7,39 +7,67 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="app-container">
+    <div class="container">
+        <!-- Left Panel: Daily Task Management -->
         <div class="left-panel">
-            <h2>Today's To-Do's</h2>
-            <ul id="todays-tasks" class="task-list"></ul>
-            <h2>Completed Tasks</h2>
-            <ul id="completed-tasks" class="task-list"></ul>
-            <button id="clear-completed">Clear All Completed</button>
+            <div class="todays-tasks">
+                <h2>Today's To-Do's</h2>
+                <div id="today-task-list" class="task-list" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <!-- Today's tasks will be dynamically added here -->
+                </div>
+            </div>
+            
+            <div class="completed-tasks">
+                <h2>Completed Tasks</h2>
+                <div id="completed-task-list" class="task-list">
+                    <!-- Completed tasks will be dynamically added here -->
+                </div>
+                <button id="clear-completed-btn">Clear All Completed</button>
+            </div>
         </div>
+
+        <!-- Right Panel: Task Creation and Selection -->
         <div class="right-panel">
-            <h2>Create New Task</h2>
-            <form id="task-form">
-                <input type="text" id="task-title" placeholder="Task Title" required>
-                <select id="task-priority" required>
-                    <option value="">Select Priority</option>
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                </select>
-                <select id="task-category" required>
-                    <option value="Other">Other</option>
-                    <option value="Work">Work</option>
-                    <option value="Chore">Chore</option>
-                    <option value="Band">Band</option>
-                    <option value="School">School</option>
-                    <option value="Family">Family</option>
-                </select>
-                <textarea id="task-notes" placeholder="Additional Notes"></textarea>
-                <button type="submit">Create Task</button>
-            </form>
-            <h2>All Tasks</h2>
-            <ul id="all-tasks" class="task-list"></ul>
+            <div class="task-creation">
+                <h2>Create New Task</h2>
+                <form id="task-form">
+                    <input type="text" id="task-title" placeholder="Task Title" required>
+                    
+                    <select id="task-priority" required>
+                        <option value="">Select Priority</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+
+                    <select id="task-category" required>
+                        <option value="">Select Category</option>
+                        <option value="Work">Work</option>
+                        <option value="Choir">Choir</option>
+                        <option value="Band">Band</option>
+                        <option value="School">School</option>
+                        <option value="Family">Family</option>
+                        <option value="Other" selected>Other</option>
+                    </select>
+
+                    <textarea id="task-notes" placeholder="Additional Notes (Optional)"></textarea>
+
+                    <div class="form-actions">
+                        <button type="submit" id="create-task-btn">Create Task</button>
+                        <button type="button" id="update-task-btn" style="display: none;">Update Task</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="task-list-section">
+                <h2>Task List</h2>
+                <div id="task-list" class="task-list">
+                    <!-- All tasks will be dynamically added here -->
+                </div>
+            </div>
         </div>
     </div>
-    <script src="app.js"></script>
+
+    <script src="script.js"></script>
 </body>
 </html>
