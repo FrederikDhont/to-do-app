@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="left-panel">
+            <h2>Today's To-Do's</h2>
+            <ul id="todays-tasks" class="task-list"></ul>
+            <h2>Completed Tasks</h2>
+            <ul id="completed-tasks" class="task-list"></ul>
+            <button id="clear-completed">Clear All Completed</button>
+        </div>
+        <div class="right-panel">
+            <h2>Create New Task</h2>
+            <form id="task-form">
+                <input type="text" id="task-title" placeholder="Task Title" required>
+                <select id="task-priority" required>
+                    <option value="">Select Priority</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+                <select id="task-category" required>
+                    <option value="Other">Other</option>
+                    <option value="Work">Work</option>
+                    <option value="Chore">Chore</option>
+                    <option value="Band">Band</option>
+                    <option value="School">School</option>
+                    <option value="Family">Family</option>
+                </select>
+                <textarea id="task-notes" placeholder="Additional Notes"></textarea>
+                <button type="submit">Create Task</button>
+            </form>
+            <h2>All Tasks</h2>
+            <ul id="all-tasks" class="task-list"></ul>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
