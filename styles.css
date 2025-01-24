@@ -1,8 +1,16 @@
+:root {
+  --primary-color: #e6f2ff;
+  --secondary-color: #b3d9ff;
+  --text-color: #333;
+  --light-text-color: #666;
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f0f0f0;
+  background-color: var(--primary-color);
+  color: var(--text-color);
 }
 
 .app-container {
@@ -34,13 +42,25 @@ h2 {
 }
 
 .task-list li {
-  background-color: #f9f9f9;
+  background-color: var(--primary-color);
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 5px;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.task-list li .task-main {
+  display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.task-list li .task-meta {
+  font-size: 0.8em;
+  color: var(--light-text-color);
+  margin-top: 5px;
 }
 
 .task-list li.completed {
@@ -66,17 +86,30 @@ h2 {
   border-radius: 5px;
 }
 
+button {
+  padding: 5px 10px;
+  background-color: var(--secondary-color);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+button:hover {
+  background-color: #80bfff;
+}
+
 #task-form button,
 #category-form button {
-  background-color: #4caf50;
+  /*background-color: #4caf50;
   color: white;
   border: none;
-  cursor: pointer;
+  cursor: pointer;*/
 }
 
 #task-form button:hover,
 #category-form button:hover {
-  background-color: #45a049;
+  /*background-color: #45a049;*/
 }
 
 .task-actions {
@@ -85,15 +118,15 @@ h2 {
 }
 
 .task-actions button {
-  padding: 5px 10px;
+  /*padding: 5px 10px;
   background-color: #f0f0f0;
   border: none;
   border-radius: 3px;
-  cursor: pointer;
+  cursor: pointer;*/
 }
 
 .task-actions button:hover {
-  background-color: #e0e0e0;
+  /*background-color: #e0e0e0;*/
 }
 
 #clear-completed {
@@ -108,6 +141,33 @@ h2 {
 
 #clear-completed:hover {
   background-color: #d32f2f;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.collapsible .collapse-btn {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.collapsible .collapse-content {
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
 }
 
 #category-list {
