@@ -15,6 +15,7 @@ body {
 
 .app-container {
   display: flex;
+  flex-wrap: wrap;
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
@@ -22,9 +23,9 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.left-panel,
-.right-panel {
+.panel {
   flex: 1;
+  min-width: 300px;
   padding: 20px;
 }
 
@@ -57,6 +58,11 @@ h2 {
   align-items: center;
 }
 
+.task-list li .task-title {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
 .task-list li .task-meta {
   font-size: 0.8em;
   color: var(--light-text-color);
@@ -74,6 +80,7 @@ h2 {
   flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 #task-form input,
@@ -99,38 +106,21 @@ button:hover {
   background-color: #80bfff;
 }
 
-#task-form button,
-#category-form button {
-  /*background-color: #4caf50;
-  color: white;
-  border: none;
-  cursor: pointer;*/
-}
-
-#task-form button:hover,
-#category-form button:hover {
-  /*background-color: #45a049;*/
-}
-
 .task-actions {
   display: flex;
   gap: 5px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .task-actions button {
-  /*padding: 5px 10px;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;*/
-}
-
-.task-actions button:hover {
-  /*background-color: #e0e0e0;*/
+  font-size: 0.8em;
+  padding: 3px 6px;
 }
 
 #clear-completed {
   margin-top: 10px;
+  margin-bottom: 20px;
   padding: 10px;
   background-color: #f44336;
   color: white;
@@ -200,5 +190,20 @@ button:hover {
 
 #category-list button:hover {
   background-color: #e0e0e0;
+}
+
+.unscheduled-header {
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .left-panel {
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+  }
 }
 
