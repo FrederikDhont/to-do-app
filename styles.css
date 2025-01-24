@@ -192,10 +192,6 @@ button:hover {
   background-color: #e0e0e0;
 }
 
-.unscheduled-header {
-  margin-top: 20px;
-}
-
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
