@@ -2,105 +2,103 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
+    background-color: #f4f4f4;
 }
 
-.app-container {
+.container {
     display: flex;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 100vh;
 }
 
 .left-panel, .right-panel {
     flex: 1;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .left-panel {
-    border-right: 1px solid #ccc;
+    background-color: #e9ecef;
+    display: flex;
+    flex-direction: column;
 }
 
-h2 {
-    margin-top: 0;
+.right-panel {
+    background-color: #f8f9fa;
 }
 
 .task-list {
-    list-style-type: none;
-    padding: 0;
+    min-height: 200px;
+    border: 2px dashed #ced4da;
+    padding: 10px;
+    margin-bottom: 15px;
 }
 
-.task-list li {
-    background-color: #f9f9f9;
+.task-item {
+    background-color: white;
+    border: 1px solid #dee2e6;
     margin-bottom: 10px;
     padding: 10px;
-    border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: move;
 }
 
-.task-list li.completed {
-    opacity: 0.6;
+.task-item.completed {
+    background-color: #d4edda;
     text-decoration: line-through;
-}
-
-#task-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-#task-form input,
-#task-form select,
-#task-form textarea,
-#task-form button {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#task-form button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-#task-form button:hover {
-    background-color: #45a049;
 }
 
 .task-actions {
     display: flex;
-    gap: 5px;
+    gap: 10px;
 }
 
-.task-actions button {
-    padding: 5px 10px;
-    background-color: #f0f0f0;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
+.task-creation form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.task-actions button:hover {
-    background-color: #e0e0e0;
+.task-creation input, 
+.task-creation select, 
+.task-creation textarea {
+    padding: 8px;
+    margin-bottom: 10px;
 }
 
-#clear-completed {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #f44336;
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    padding: 8px 15px;
+    background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-#clear-completed:hover {
-    background-color: #d32f2f;
+button:hover {
+    background-color: #0056b3;
+}
+
+#clear-completed-btn {
+    background-color: #dc3545;
+}
+
+#clear-completed-btn:hover {
+    background-color: #a71d2a;
+}
+
+.todays-tasks, .completed-tasks {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.completed-tasks {
+    margin-top: 20px;
 }
